@@ -1,3 +1,22 @@
 {
-  "presets": ["es2015", "react"]
+  "presets": ["@babel/preset-env", "@babel/preset-react", "@babel/preset-typescript"],
+  "plugins": [
+    "@babel/plugin-transform-runtime",
+    "@babel/proposal-class-properties",
+    ["babel-plugin-transform-rename-import", { "original": "^(.+?)\\.scss", "replacement": "$1.css" }],
+    [
+      "babel-plugin-import",
+      {
+        "libraryName": "lodash",
+        "libraryDirectory": "",
+        "camel2DashComponentName": false
+      },
+      "lodash"
+    ]
+  ],
+  "ignore": [
+    "./src/**/*.test.tsx",
+    "./src/setupTests.ts",
+    "./src/**/*.d.ts"
+  ]
 }
