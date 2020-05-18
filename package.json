@@ -1,6 +1,6 @@
 {
   "name": "react-vis-timeline",
-  "version": "2.0.0",
+  "version": "2.0.2",
   "description": "React component for the vis-timeline module",
   "main": "build/index.js",
   "types": "build/index.d.ts",
@@ -13,7 +13,7 @@
     "prepublish": "npm run build",
     "lint": "eslint --ext .ts,.tsx ./src/",
     "lint-watch": "esw -w --clear --color .ts,.tsx ./src",
-    "lint-autofix": "npm run lint -- --fix",
+    "lint-autofix": "yarn run lint -- --fix",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "lint-staged": {
