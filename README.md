@@ -42,21 +42,21 @@ const options = {
 * Using `vis-timeline` library! without the  old `vis.js`
 * No unnecessary re-renders
 
-  the old lib re-rendered on each prop changed, while using immutable objects to detect changes.
+  The old lib caused re-renders on each prop changed, and using immutable objects to detect changes.
   This was very problematic and caused performance issues.
   We don't wont to re-render the whole timeline, just because 1 item added to the items array.
   
 * API changes (items, groups)
 
-  vis-timeline already know how to detect changes with `vis-data`'s DataSet object.
-  So in this library we take it as an advantage and using this DataSets.
+  vis-timeline already knows how to detect changes with `vis-data`'s DataSet object.
+  So in this library, we take it as an advantage and using these DataSets.
   While exposing them to the user within `ref`.
   
-  Yoa can also insert initial data with props, and update/add/remove later with ref API.
+  You can also insert initial data with props, and update/add/remove later with ref API.
   
-* Expose timeline's API.
+* Expose the timeline's API.
 
-  Methods like `focuse`, `fit` and many more native vis-timeline methods exposed as well in optional `ref`.
+  Methods like `focus`, `fit`, and many more native vis-timeline methods exposed as well in optional `ref`.
 
 
 ## Supported Features
