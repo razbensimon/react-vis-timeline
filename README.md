@@ -44,7 +44,7 @@ const options = {
 
   The old lib caused re-renders on each prop changed, and using immutable objects to detect changes.
   This was very problematic and caused performance issues.
-  We don't wont to re-render the whole timeline, just because 1 item added to the items array.
+  We don't want to re-render the whole timeline, just because 1 item added to the items array.
   
 * API changes (items, groups)
 
