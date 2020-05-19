@@ -1,62 +1,79 @@
-React Vis.js Timeline
+React vis-timeline component
 =====================
 
-React component for the vis.js timeline module.
+React component for the `vis-timeline` timeline module.
 
-[vis.js Timeline Documentation](http://visjs.org/docs/timeline)
+[vis-timeline documentation](https://visjs.github.io/vis-timeline/docs/timeline/)
 
 ## Installation
 
 ```
-npm install --save vis
-npm install --save react-visjs-timeline
+npm install --save react-vis-timeline
+```
+
+OR
+
+```
+yarn add react-vis-timeline
 ```
 
 ## Getting Started
 
-**Note:** Data passed to the component *should be Immutable*. If you are new to Immutable data [Seamless Immutable](https://github.com/rtfeldman/seamless-immutable) and [Immutable.js](https://facebook.github.io/immutable-js/) are good places to start.
+```typescript
+import Timeline from 'react-vis-timeline'
 
-```
-import Timeline from 'react-visjs-timeline'
+// https://visjs.github.io/vis-timeline/docs/timeline/#Configuration_Options
 
-// http://visjs.org/docs/timeline/#Configuration_Options
 const options = {
   width: '100%',
-  height: '60px',
-  stack: false,
-  showMajorLabels: true,
-  showCurrentTime: true,
-  zoomMin: 1000000,
-  type: 'background',
-  format: {
-    minorLabels: {
-      minute: 'h:mma',
-      hour: 'ha'
-    }
-  }
+  height: '100px',
+  // ...
+  // ...
 }
 
-// jsx
+// JSX
 <Timeline options={options} />
 ```
 
+
+## What are the differences from `react-visjs-timeline` ?
+
+* Written in Typescript
+* Using `vis-timeline` library! without the  old `vis.js`
+* No unnecessary re-renders
+
+  the old lib re-rendered on each prop changed, while using immutable objects to detect changes.
+  This was very problematic and caused performance issues.
+  We don't wont to re-render the whole timeline, just because 1 item added to the items array.
+  
+* API changes (items, groups)
+
+  vis-timeline already know how to detect changes with `vis-data`'s DataSet object.
+  So in this library we take it as an advantage and using this DataSets.
+  While exposing them to the user within `ref`.
+  
+  Yoa can also insert initial data with props, and update/add/remove later with ref API.
+  
+* Expose timeline's API.
+
+  Methods like `focuse`, `fit` and many more native vis-timeline methods exposed as well in optional `ref`.
+
+
 ## Supported Features
-
-Not all features from vis.js timeline are supported (Pull Requests are welcome). Because of React's declarative style, vis.js methods need abstracting via prop configuration (see customTimes for example) so some features are more tricky than others.
-
-### Supported
 
 * Configuration Options
 * Items
 * Groups
 * Custom Times
 * Events
+* Selection
+* Timeline's API
 
 ## Items
 
-Items follow the exact same for format as they do in vis.js. See the [vis.js documentation](http://visjs.org/docs/timeline/#items) for more information.
+Items follow the exact same for format as they do in `vis-timeline``. See the [vis-timeline documentation](https://visjs.github.io/vis-timeline/docs/timeline/#items) for more information.
 
-```
+```typescript
 const items = [{
   start: new Date(2010, 7, 15),
   end: new Date(2010, 8, 2),  // end is optional
@@ -65,15 +82,15 @@ const items = [{
 
 <Timeline
   options={options}
-  items={items}
+  initialItems={items}
 />
 ```
 
 ## Groups
 
-Groups follow the exact same for format as they do in vis.js. See the [vis.js documentation](http://visjs.org/docs/timeline/#groups) for more information.
+Groups follow the exact same for format as they do in vis-timeline. See the [vis-timeline documentation](https://visjs.github.io/vis-timeline/docs/timeline/#groups) for more information.
 
-```
+```typescript
 const groups = [{
   id: 1,
   content: 'Group A',
@@ -81,29 +98,35 @@ const groups = [{
 
 <Timeline
   options={options}
-  groups={groups}
+  initialGroups={groups}
 />
 ```
 
 ## Custom Times
 
-Custom Times are defined more declaritively in the component, via the `customTimes` prop. You define them via a simple object where the key is the `id` of the custom time and the value is the datetime:
+CustomTimes defined more declaratively in the component, via the `customTimes` prop.
 
-```
-const customTimes = {
-  one: new Date(),
-  two: 'Tue May 10 2016 16:17:44 GMT+1000 (AEST)'
-}
+```typescript
+const customTimes = [
+  {
+    id: 'one',
+    datetime: new Date()
+  },
+  {
+    id: 'two',
+    datetime: 'Tue May 10 2016 16:17:44 GMT+1000 (AEST)'
+  }
+]
 ```
 
 When the `customTimes` prop changes, the updated times will be reflected in the timeline.
 
 ## Events
 
-All events are supported via prop function handlers. The prop name follows the convention `<eventName>Handler` and the specified function will receive the same arguments as the [vis.js counterparts](http://visjs.org/docs/timeline/#Events).
-Some visjs event names are not camelcased (e.g. `rangechange`), so the corresponding React prop names need to follow that convention where necessary:
+All events are supported via prop function handlers. The prop name follows the convention `<eventName>Handler` and the specified function will receive the same arguments as the [vis-timeline counterparts](https://visjs.github.io/vis-timeline/docs/timeline/#Events).
+Some vis-timeline event names are not camelcased (e.g. `rangechange`), so the corresponding React prop names need to follow that convention where necessary:
 
-```
+```typescript
 <Timeline
   options={options}
   clickHandler={clickHandler}
@@ -121,13 +144,13 @@ function rangeChangeHandler(props) {
 
 ## Animation
 
-You can enable animation (when the options start/end values change) by passing a prop of `animation` to the component. The available options for this prop follow the same conventions as `setWindow` in vis.js. So you can either pass a boolean value (`true` by default) or an object specifying your animation configuration, e.g:
+You can enable animation (when the options start/end values change) by passing a prop of `animation` to the component. The available options for this prop follow the same conventions as `setWindow` in `vis-timeline`. So you can either pass a boolean value (`true` by default) or an object specifying your animation configuration, e.g:
 
-```
+```typescript
 // animate prop...
 {
   duration: 3000,
-  easingFunction: 'easeInQuint',
+  easingFunction: 'easeInQuint'
 }
 ```
 
@@ -135,7 +158,7 @@ You can enable animation (when the options start/end values change) by passing a
 
 Import your custom CSS *after* you import the component from the module, e.g:
 
-```
-import Timeline from 'react-visjs-timeline'
-import './my-custom-css.css' // in conjunction with webpack's style-loader
+```typescript
+import Timeline from 'react-vis-timeline';
+import './my-custom-css.css';
 ```

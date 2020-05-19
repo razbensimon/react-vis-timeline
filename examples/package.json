@@ -1,12 +1,13 @@
 {
 	"name": "react-vis-timeline-examples",
-	"version": "0.1.0",
+	"version": "0.2.0",
 	"private": true,
 	"dependencies": {
-		"moment": "^2.18.1",
+		"lodash": "^4.17.15",
+		"moment": "^2.25.3",
 		"react": "^16.13.1",
 		"react-dom": "^16.6.1",
-		"react-visjs-timeline": "1.5.0"
+		"react-vis-timeline": "^2.0.3"
 	},
 	"devDependencies": {
 		"react-scripts": "^3.4.1"
@@ -16,5 +17,17 @@
 		"build": "react-scripts build",
 		"test": "react-scripts test --env=jsdom",
 		"eject": "react-scripts eject"
+	},
+	"browserslist": {
+		"production": [
+			">0.2%",
+			"not dead",
+			"not op_mini all"
+		],
+		"development": [
+			"last 1 chrome version",
+			"last 1 firefox version",
+			"last 1 safari version"
+		]
 	}
 }

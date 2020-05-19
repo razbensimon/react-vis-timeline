@@ -1,28 +1,29 @@
 import React, { Component } from 'react';
-import Timeline from 'react-visjs-timeline';
+import Timeline from 'react-vis-timeline';
 import moment from 'moment';
 import './App.css';
 
-const basicExample = {
-	options: {
-		start: '2014-04-10',
-		end: '2014-04-30'
-	},
-	items: [
-		{ id: 1, content: 'item 1', start: '2014-04-20' },
-		{ id: 2, content: 'item 2', start: '2014-04-14' },
-		{ id: 3, content: 'item 3', start: '2014-04-18' },
-		{ id: 4, content: 'item 4', start: '2014-04-16', end: '2014-04-19' },
-		{ id: 5, content: 'item 5', start: '2014-04-25' },
-		{ id: 6, content: 'item 6', start: '2014-04-27', type: 'point' }
-	]
-};
+function createItem(id, groupId, name, startTime) {
+	return {
+		id: id,
+		group: groupId,
+		content: 'item ' + id + ' <span style="color:#97B0F8">(' + name + ')</span>',
+		start: startTime,
+		end: startTime.clone().add(1, 'hours'),
+		type: 'box'
+	};
+}
 
-const groupsExample = {
-	groups: [],
-	items: [],
+const props = {
+	initialGroups: [],
+	initialItems: [],
 	options: {
-		groupOrder: 'content' // groupOrder can be a property name or a sorting function
+		height: '100%',
+		autoResize: true,
+		stack: true, // false == overlap items
+		orientation: 'top',
+		verticalScroll: true,
+		zoomKey: 'ctrlKey'
 	}
 };
 
@@ -33,23 +34,19 @@ const itemCount = 20;
 // create a data set with groups
 const names = ['John', 'Alston', 'Lee', 'Grant'];
 for (let g = 0; g < groupCount; g++) {
-	groupsExample.groups.push({ id: g, content: names[g] });
+	props.initialGroups.push({ id: g, content: names[g] });
 }
 
 // create a dataset with items
 for (let i = 0; i < itemCount; i++) {
 	const start = now.clone().add(Math.random() * 200, 'hours');
 	const group = Math.floor(Math.random() * groupCount);
-	groupsExample.items.push({
-		id: i,
-		group: group,
-		content: 'item ' + i + ' <span style="color:#97B0F8">(' + names[group] + ')</span>',
-		start: start,
-		type: 'box'
-	});
+	props.initialItems.push(createItem(i, group, names[group], start));
 }
 
 class App extends Component {
+	timelineRef = React.createRef();
+
 	constructor(props) {
 		super(props);
 
@@ -58,31 +55,44 @@ class App extends Component {
 		};
 	}
 
+	onAddItem = () => {
+		var nextId = this.timelineRef.current.items.length + 1;
+		const group = Math.floor(Math.random() * groupCount);
+		this.timelineRef.current.items.add(createItem(nextId, group, names[group], moment()));
+		this.timelineRef.current.timeline.fit();
+	};
+
+	onFit = () => {
+		this.timelineRef.current.timeline.fit();
+	};
+
 	render() {
 		return (
 			<div className="App">
-				<p className="header">A basic timeline. You can move and zoom the timeline, and select items.</p>
-				<Timeline {...basicExample} />
-				<p className="header">
-					This example demonstrate using groups. Note that a DataSet is used for both items and groups,
-					allowing to dynamically add, update or remove both items and groups via the DataSet.
-				</p>
-				<Timeline
-					{...groupsExample}
-					clickHandler={this.clickHandler.bind(this)}
-					selection={this.state.selectedIds}
-				/>
+				<p className="header">This example demonstrate using groups.</p>
+				<div className="timeline-container">
+					<Timeline
+						ref={this.timelineRef}
+						{...props}
+						clickHandler={this.clickHandler}
+						selection={this.state.selectedIds}
+					/>
+				</div>
+				<br />
+				<button onClick={this.onAddItem}>Add Item</button>
+				<button onClick={this.onFit}>Fit Screen</button>
 			</div>
 		);
 	}
 
-	clickHandler(props) {
-		const { group } = props;
-		const selectedIds = groupsExample.items.filter(item => item.group === group).map(item => item.id);
+	clickHandler = () => {
+		const { group } = this.props;
+		var items = this.timelineRef.current.items.get();
+		const selectedIds = items.filter(item => item.group === group).map(item => item.id);
 		this.setState({
 			selectedIds
 		});
-	}
+	};
 }
 
 export default App;

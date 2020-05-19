@@ -74,7 +74,7 @@ export class Timeline extends Component<Props, {}> {
 		eventDefaultProps
 	);
 
-	public timeline: VisTimeline;
+	public timeline: Readonly<VisTimeline>;
 	public readonly items: DataSet<TimelineItem>;
 	public readonly groups: DataSet<TimelineGroup>;
 
@@ -83,18 +83,15 @@ export class Timeline extends Component<Props, {}> {
 	constructor(props: Props) {
 		super(props);
 
-		// Object.defineProperty(this, 'items', {
-		// 	value: new DataSet<TimelineItem>(),
-		// 	writable: false
-		// });
-		//
-		// Object.defineProperty(this, 'groups', {
-		// 	value: new DataSet<TimelineGroup>(),
-		// 	writable: false
-		// });
+		Object.defineProperty(this, 'items', {
+			value: new DataSet<TimelineItem>(),
+			writable: false
+		});
 
-		this.items = new DataSet<TimelineItem>();
-		this.groups = new DataSet<TimelineGroup>();
+		Object.defineProperty(this, 'groups', {
+			value: new DataSet<TimelineGroup>(),
+			writable: false
+		});
 	}
 
 	componentWillUnmount() {
@@ -102,7 +99,10 @@ export class Timeline extends Component<Props, {}> {
 	}
 
 	componentDidMount() {
-		this.timeline = new VisTimelineCtor(this.#ref.current, this.items, this.groups, this.props.options);
+		Object.defineProperty(this, 'timeline', {
+			value: new VisTimelineCtor(this.#ref.current, this.items, this.groups, this.props.options),
+			writable: false
+		});
 
 		for (const event of events) {
 			const eventHandler = this.props[`${event}Handler`];
