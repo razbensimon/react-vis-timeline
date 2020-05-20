@@ -5,6 +5,8 @@ React component for the `vis-timeline` timeline module.
 
 [vis-timeline documentation](https://visjs.github.io/vis-timeline/docs/timeline/)
 
+![example chart](https://github.com/visjs/vis-timeline/blob/master/docs/img/timeline.png)
+
 ## Installation
 
 ```
