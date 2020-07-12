@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>React-vis-timeline by razbensimon</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">React-vis-timeline</h1>
+      <h2 class="project-tagline">React component for the vis-timeline module</h2>
+      <a href="https://github.com/razbensimon/react-vis-timeline" class="btn">View on GitHub</a>
+      <a href="https://github.com/razbensimon/react-vis-timeline/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/razbensimon/react-vis-timeline/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <h1>
+<a id="react-vis-timeline-component" class="anchor" href="#react-vis-timeline-component" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>React vis-timeline component</h1>
+<p>React component for the <code>vis-timeline</code> timeline module.</p>
+<p><a href="https://visjs.github.io/vis-timeline/docs/timeline/">vis-timeline documentation</a></p>
+<p><img src="https://github.com/visjs/vis-timeline/blob/master/docs/img/timeline.png" alt="example chart"></p>
+<h2>
+<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Installation</h2>
+<pre><code>npm install --save react-vis-timeline
+</code></pre>
+<p>OR</p>
+<pre><code>yarn add react-vis-timeline
+</code></pre>
+<h2>
+<a id="getting-started" class="anchor" href="#getting-started" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Getting Started</h2>
+<div class="highlight highlight-source-ts"><pre><span class="pl-k">import</span> <span class="pl-smi">Timeline</span> <span class="pl-k">from</span> <span class="pl-s">'react-vis-timeline'</span>
+
+<span class="pl-c">// https://visjs.github.io/vis-timeline/docs/timeline/#Configuration_Options</span>
+
+<span class="pl-k">const</span> <span class="pl-s1">options</span> <span class="pl-c1">=</span> <span class="pl-kos">{</span>
+  <span class="pl-c1">width</span>: <span class="pl-s">'100%'</span><span class="pl-kos">,</span>
+  <span class="pl-c1">height</span>: <span class="pl-s">'100px'</span><span class="pl-kos">,</span>
+  <span class="pl-c">// ...</span>
+  <span class="pl-c">// ...</span>
+<span class="pl-kos">}</span>
+
+<span class="pl-c">// JSX</span>
+<span class="pl-kos">&lt;</span><span class="pl-smi">Timeline</span> <span class="pl-s1">options</span><span class="pl-c1">=</span><span class="pl-kos">{</span>options<span class="pl-kos">}</span> /<span class="pl-kos">&gt;</span></pre></div>
+<h2>
+<a id="what-are-the-differences-from-react-visjs-timeline-" class="anchor" href="#what-are-the-differences-from-react-visjs-timeline-" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>What are the differences from <code>react-visjs-timeline</code> ?</h2>
+<ul>
+<li>
+<p>Written in Typescript</p>
+</li>
+<li>
+<p>Using <code>vis-timeline</code> library! without the  old <code>vis.js</code></p>
+</li>
+<li>
+<p>No unnecessary re-renders</p>
+<p>The old lib caused re-renders on each prop changed, and using immutable objects to detect changes.
+This was very problematic and caused performance issues.
+We don't want to re-render the whole timeline, just because 1 item added to the items array.</p>
+</li>
+<li>
+<p>API changes (items, groups)</p>
+<p>vis-timeline already knows how to detect changes with <code>vis-data</code>'s DataSet object.
+So in this library, we take it as an advantage and using these DataSets.
+While exposing them to the user within <code>ref</code>.</p>
+<p>You can also insert initial data with props, and update/add/remove later with ref API.</p>
+</li>
+<li>
+<p>Expose the timeline's API.</p>
+<p>Methods like <code>focus</code>, <code>fit</code>, and many more native vis-timeline methods exposed as well in optional <code>ref</code>.</p>
+</li>
+</ul>
+<h2>
+<a id="supported-features" class="anchor" href="#supported-features" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Supported Features</h2>
+<ul>
+<li>Configuration Options</li>
+<li>Items</li>
+<li>Groups</li>
+<li>Custom Times</li>
+<li>Events</li>
+<li>Selection</li>
+<li>Timeline's API</li>
+</ul>
+<h2>
+<a id="items" class="anchor" href="#items" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Items</h2>
+<p>Items follow the exact same for format as they do in `vis-timeline``. See the <a href="https://visjs.github.io/vis-timeline/docs/timeline/#items">vis-timeline documentation</a> for more information.</p>
+<div class="highlight highlight-source-ts"><pre><span class="pl-k">const</span> <span class="pl-s1">items</span> <span class="pl-c1">=</span> <span class="pl-kos">[</span><span class="pl-kos">{</span>
+  <span class="pl-c1">start</span>: <span class="pl-k">new</span> <span class="pl-smi">Date</span><span class="pl-kos">(</span><span class="pl-c1">2010</span><span class="pl-kos">,</span> <span class="pl-c1">7</span><span class="pl-kos">,</span> <span class="pl-c1">15</span><span class="pl-kos">)</span><span class="pl-kos">,</span>
+  <span class="pl-c1">end</span>: <span class="pl-k">new</span> <span class="pl-smi">Date</span><span class="pl-kos">(</span><span class="pl-c1">2010</span><span class="pl-kos">,</span> <span class="pl-c1">8</span><span class="pl-kos">,</span> <span class="pl-c1">2</span><span class="pl-kos">)</span><span class="pl-kos">,</span>  <span class="pl-c">// end is optional</span>
+  <span class="pl-c1">content</span>: <span class="pl-s">'Trajectory A'</span><span class="pl-kos">,</span>
+<span class="pl-kos">}</span><span class="pl-kos">]</span>
+
+<span class="pl-c1">&lt;</span><span class="pl-smi">Timeline</span>
+  <span class="pl-s1">options</span><span class="pl-c1">=</span><span class="pl-kos">{</span>options<span class="pl-kos">}</span>
+  <span class="pl-s1">initialItems</span><span class="pl-c1">=</span><span class="pl-kos">{</span>items<span class="pl-kos">}</span>
+/<span class="pl-c1">&gt;</span></pre></div>
+<h2>
+<a id="groups" class="anchor" href="#groups" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Groups</h2>
+<p>Groups follow the exact same for format as they do in vis-timeline. See the <a href="https://visjs.github.io/vis-timeline/docs/timeline/#groups">vis-timeline documentation</a> for more information.</p>
+<div class="highlight highlight-source-ts"><pre><span class="pl-k">const</span> <span class="pl-s1">groups</span> <span class="pl-c1">=</span> <span class="pl-kos">[</span><span class="pl-kos">{</span>
+  <span class="pl-c1">id</span>: <span class="pl-c1">1</span><span class="pl-kos">,</span>
+  <span class="pl-c1">content</span>: <span class="pl-s">'Group A'</span><span class="pl-kos">,</span>
+<span class="pl-kos">}</span><span class="pl-kos">]</span>
+
+<span class="pl-c1">&lt;</span><span class="pl-smi">Timeline</span>
+  <span class="pl-s1">options</span><span class="pl-c1">=</span><span class="pl-kos">{</span>options<span class="pl-kos">}</span>
+  <span class="pl-s1">initialGroups</span><span class="pl-c1">=</span><span class="pl-kos">{</span>groups<span class="pl-kos">}</span>
+/<span class="pl-c1">&gt;</span></pre></div>
+<h2>
+<a id="custom-times" class="anchor" href="#custom-times" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Custom Times</h2>
+<p>CustomTimes defined more declaratively in the component, via the <code>customTimes</code> prop.</p>
+<div class="highlight highlight-source-ts"><pre><span class="pl-k">const</span> <span class="pl-s1">customTimes</span> <span class="pl-c1">=</span> <span class="pl-kos">[</span>
+  <span class="pl-kos">{</span>
+    <span class="pl-c1">id</span>: <span class="pl-s">'one'</span><span class="pl-kos">,</span>
+    <span class="pl-c1">datetime</span>: <span class="pl-k">new</span> <span class="pl-smi">Date</span><span class="pl-kos">(</span><span class="pl-kos">)</span>
+  <span class="pl-kos">}</span><span class="pl-kos">,</span>
+  <span class="pl-kos">{</span>
+    <span class="pl-c1">id</span>: <span class="pl-s">'two'</span><span class="pl-kos">,</span>
+    <span class="pl-c1">datetime</span>: <span class="pl-s">'Tue May 10 2016 16:17:44 GMT+1000 (AEST)'</span>
+  <span class="pl-kos">}</span>
+<span class="pl-kos">]</span></pre></div>
+<p>When the <code>customTimes</code> prop changes, the updated times will be reflected in the timeline.</p>
+<h2>
+<a id="events" class="anchor" href="#events" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Events</h2>
+<p>All events are supported via prop function handlers. The prop name follows the convention <code>&lt;eventName&gt;Handler</code> and the specified function will receive the same arguments as the <a href="https://visjs.github.io/vis-timeline/docs/timeline/#Events">vis-timeline counterparts</a>.
+Some vis-timeline event names are not camelcased (e.g. <code>rangechange</code>), so the corresponding React prop names need to follow that convention where necessary:</p>
+<div class="highlight highlight-source-ts"><pre><span class="pl-kos">&lt;</span><span class="pl-smi">Timeline</span><span class="pl-kos"></span>
+  <span class="pl-s1">options</span><span class="pl-c1">=</span><span class="pl-kos">{</span>options<span class="pl-kos">}</span>
+  <span class="pl-s1">clickHandler</span><span class="pl-c1">=</span><span class="pl-kos">{</span>clickHandler<span class="pl-kos">}</span>
+  <span class="pl-s1">rangechangeHandler</span><span class="pl-c1">=</span><span class="pl-kos">{</span>rangeChangeHandler<span class="pl-kos">}</span>
+/<span class="pl-c1">&gt;</span>
+
+<span class="pl-k">function</span> <span class="pl-en">clickHandler</span><span class="pl-kos">(</span><span class="pl-s1">props</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+  <span class="pl-c">// handle click event</span>
+<span class="pl-kos">}</span>
+
+<span class="pl-k">function</span> <span class="pl-en">rangeChangeHandler</span><span class="pl-kos">(</span><span class="pl-s1">props</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+  <span class="pl-c">// handle range change</span>
+<span class="pl-kos">}</span></pre></div>
+<h2>
+<a id="animation" class="anchor" href="#animation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Animation</h2>
+<p>You can enable animation (when the options start/end values change) by passing a prop of <code>animation</code> to the component. The available options for this prop follow the same conventions as <code>setWindow</code> in <code>vis-timeline</code>. So you can either pass a boolean value (<code>true</code> by default) or an object specifying your animation configuration, e.g:</p>
+<div class="highlight highlight-source-ts"><pre><span class="pl-c">// animate prop...</span>
+<span class="pl-kos">{</span>
+  <span class="pl-c1">duration</span>: <span class="pl-c1">3000</span><span class="pl-kos">,</span>
+  <span class="pl-c1">easingFunction</span>: <span class="pl-s">'easeInQuint'</span>
+<span class="pl-kos">}</span></pre></div>
+<h2>
+<a id="styling" class="anchor" href="#styling" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Styling</h2>
+<p>Import your custom CSS <em>after</em> you import the component from the module, e.g:</p>
+<div class="highlight highlight-source-ts"><pre><span class="pl-k">import</span> <span class="pl-smi">Timeline</span> <span class="pl-k">from</span> <span class="pl-s">'react-vis-timeline'</span><span class="pl-kos">;</span>
+<span class="pl-k">import</span> <span class="pl-s">'./my-custom-css.css'</span><span class="pl-kos">;</span></pre></div>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/razbensimon/react-vis-timeline">React-vis-timeline</a> is maintained by <a href="https://github.com/razbensimon">razbensimon</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
+</html>
