@@ -87,27 +87,20 @@ export class Timeline extends Component<Props, {}> {
 	}
 
 	override shouldComponentUpdate(nextProps: Props) {
-		const { initialItems, initialGroups, options, selection, customTimes, currentTime } = this.props;
-		const itemsChange = initialItems !== nextProps.initialItems;
-		const groupsChange = initialGroups !== nextProps.initialGroups;
-		const optionsChange = options !== nextProps.options;
-		const customTimesChange = customTimes !== nextProps.customTimes;
-		const selectionChange = selection !== nextProps.selection;
-		const currentTimeChange = currentTime !== nextProps.currentTime;
-
-		if (groupsChange) {
-			console.warn(
-				"react-vis-timeline: you are trying to change 'initialGroups' prop. Please use the public api exposed with in ref"
-			);
-		}
-
-		if (itemsChange) {
-			console.warn(
-				"react-vis-timeline: you are trying to change 'initialItems' prop. Please use the public api exposed with in ref"
-			);
-		}
-
 		if (this.timeline) {
+			const { initialItems, initialGroups, options, selection, customTimes, currentTime } = this.props;
+			const itemsChange = initialItems !== nextProps.initialItems;
+			const groupsChange = initialGroups !== nextProps.initialGroups;
+			const optionsChange = options !== nextProps.options;
+			const customTimesChange = customTimes !== nextProps.customTimes;
+			const selectionChange = selection !== nextProps.selection;
+			const currentTimeChange = currentTime !== nextProps.currentTime;
+			if (groupsChange) {
+				this.timeline.setGroups(nextProps.initialGroups);
+			}
+			if (itemsChange) {
+				this.timeline.setItems(nextProps.initialItems);
+			}
 			if (optionsChange) {
 				this.timeline.setOptions(nextProps.options);
 			}
