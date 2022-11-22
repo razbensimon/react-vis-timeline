@@ -1,26 +1,8 @@
 import React, { Component } from 'react';
-import { DataSet } from 'vis-data/esnext';
-import { Timeline as VisTimelineCtor } from 'vis-timeline/esnext';
-import type {
-	DateType,
-	IdType,
-	Timeline as VisTimeline,
-	TimelineAnimationOptions,
-	TimelineGroup,
-	TimelineItem,
-	TimelineOptions
-} from 'vis-timeline/types';
-import 'vis-timeline/styles/vis-timeline-graph2d.min.css';
-
-import _difference from 'lodash/difference';
-import _intersection from 'lodash/intersection';
-import _each from 'lodash/each';
-import _assign from 'lodash/assign';
-import _omit from 'lodash/omit';
-import _keys from 'lodash/keys';
+import { difference, intersection, each, omit, keys } from 'lodash';
 import type { CustomTime, SelectionOptions, TimelineEventsHandlers, TimelineEventsWithMissing } from './models';
-
-const noop = function () {};
+import { DateType, IdType, Timeline as VisTimeline, TimelineGroup, TimelineItem, TimelineOptions } from 'vis-timeline';
+import 'vis-timeline/styles/vis-timeline-graph2d.min.css';
 
 const events: TimelineEventsWithMissing[] = [
 	'currentTimeTick',
@@ -46,11 +28,6 @@ const events: TimelineEventsWithMissing[] = [
 	'markerchanged'
 ];
 
-const eventDefaultProps: TimelineEventsHandlers = {};
-_each(events, event => {
-	eventDefaultProps[`${event}Handler`] = noop;
-});
-
 type Props = {
 	initialItems?: TimelineItem[];
 	initialGroups?: TimelineGroup[];
@@ -63,60 +40,54 @@ type Props = {
 } & TimelineEventsHandlers;
 
 export class Timeline extends Component<Props, {}> {
-	static defaultProps = _assign(
-		{
-			initialItems: [],
-			groups: [],
-			options: {},
-			selection: [],
-			customTimes: []
-		},
-		eventDefaultProps
-	);
-
-	public timeline: Readonly<VisTimeline>;
-	public readonly items: DataSet<TimelineItem>;
-	public readonly groups: DataSet<TimelineGroup>;
+	public timeline: VisTimeline | null = null;
 
 	#ref = React.createRef<HTMLDivElement>();
 
-	constructor(props: Props) {
-		super(props);
-
-		Object.defineProperty(this, 'items', {
-			value: new DataSet<TimelineItem>(),
-			writable: false
-		});
-
-		Object.defineProperty(this, 'groups', {
-			value: new DataSet<TimelineGroup>(),
-			writable: false
-		});
+	override componentWillUnmount() {
+		this.timeline?.destroy();
 	}
 
-	componentWillUnmount() {
-		this.timeline.destroy();
-	}
-
-	componentDidMount() {
-		Object.defineProperty(this, 'timeline', {
-			value: new VisTimelineCtor(this.#ref.current, this.items, this.groups, this.props.options),
-			writable: false
-		});
-
+	override componentDidMount() {
+		this.timeline = new VisTimeline(
+			this.#ref.current,
+			this.props.initialItems,
+			this.props.initialGroups,
+			this.props.options
+		);
 		for (const event of events) {
 			const eventHandler = this.props[`${event}Handler`];
-			if (eventHandler !== noop) {
-				this.timeline.on(event, eventHandler);
+			if (typeof eventHandler === 'function') {
+				this.timeline.on(event, eventHandler as (properties: any) => void);
 			}
 		}
 
-		this.init();
+		const { options, selection, selectionOptions = {}, customTimes, animate = true, currentTime } = this.props;
+
+		let timelineOptions = options;
+
+		if (animate) {
+			// If animate option is set, we should animate the timeline to any new
+			// start/end values instead of jumping straight to them
+			timelineOptions = omit(options, 'start', 'end');
+
+			this.timeline.setWindow(options.start, options.end, {
+				animation: animate
+			});
+		}
+
+		this.timeline.setOptions(timelineOptions);
+		this.updateSelection(selection, selectionOptions);
+
+		if (currentTime) {
+			this.timeline.setCurrentTime(currentTime);
+		}
+
+		this.updateCustomTimes([], customTimes);
 	}
 
-	shouldComponentUpdate(nextProps: Props) {
+	override shouldComponentUpdate(nextProps: Props) {
 		const { initialItems, initialGroups, options, selection, customTimes, currentTime } = this.props;
-
 		const itemsChange = initialItems !== nextProps.initialItems;
 		const groupsChange = initialGroups !== nextProps.initialGroups;
 		const optionsChange = options !== nextProps.options;
@@ -136,92 +107,46 @@ export class Timeline extends Component<Props, {}> {
 			);
 		}
 
-		if (optionsChange) {
-			this.timeline.setOptions(nextProps.options);
+		if (this.timeline) {
+			if (optionsChange) {
+				this.timeline.setOptions(nextProps.options);
+			}
+			if (customTimesChange) {
+				this.updateCustomTimes(customTimes, nextProps.customTimes);
+			}
+			if (selectionChange) {
+				this.updateSelection(nextProps.selection, nextProps.selectionOptions);
+			}
+			if (currentTimeChange) {
+				this.timeline.setCurrentTime(nextProps.currentTime);
+			}
 		}
-
-		if (customTimesChange) {
-			this.updateCustomTimes(customTimes, nextProps.customTimes);
-		}
-
-		if (selectionChange) {
-			this.updateSelection(nextProps.selection, nextProps.selectionOptions);
-		}
-
-		if (currentTimeChange) {
-			this.timeline.setCurrentTime(nextProps.currentTime);
-		}
-
 		return false;
 	}
 
-	updateCustomTimes(prevCustomTimes: CustomTime[], customTimes: CustomTime[]) {
+	private updateCustomTimes(prevCustomTimes: CustomTime[], customTimes: CustomTime[]) {
 		// diff the custom times to decipher new, removing, updating
-		const customTimeKeysPrev = _keys(prevCustomTimes);
-		const customTimeKeysNew = _keys(customTimes);
-		const customTimeKeysToAdd = _difference(customTimeKeysNew, customTimeKeysPrev);
-		const customTimeKeysToRemove = _difference(customTimeKeysPrev, customTimeKeysNew);
-		const customTimeKeysToUpdate = _intersection(customTimeKeysPrev, customTimeKeysNew);
-
-		_each(customTimeKeysToRemove, id => this.timeline.removeCustomTime(id));
-		_each(customTimeKeysToAdd, id => {
+		const customTimeKeysPrev = keys(prevCustomTimes);
+		const customTimeKeysNew = keys(customTimes);
+		const customTimeKeysToAdd = difference(customTimeKeysNew, customTimeKeysPrev);
+		const customTimeKeysToRemove = difference(customTimeKeysPrev, customTimeKeysNew);
+		const customTimeKeysToUpdate = intersection(customTimeKeysPrev, customTimeKeysNew);
+		each(customTimeKeysToRemove, id => this.timeline.removeCustomTime(id));
+		each(customTimeKeysToAdd, id => {
 			const datetime = customTimes[id].datetime;
 			this.timeline.addCustomTime(datetime, id);
 		});
-		_each(customTimeKeysToUpdate, id => {
+		each(customTimeKeysToUpdate, id => {
 			const datetime = customTimes[id].datetime;
 			this.timeline.setCustomTime(datetime, id);
 		});
 	}
 
-	updateSelection(selection: IdType | IdType[], selectionOptions: SelectionOptions): void {
+	private updateSelection(selection: IdType | IdType[], selectionOptions: SelectionOptions): void {
 		this.timeline.setSelection(selection, selectionOptions as Required<SelectionOptions>);
 	}
 
-	init() {
-		const {
-			initialItems,
-			initialGroups,
-			options,
-			selection,
-			selectionOptions = {},
-			customTimes,
-			animate = true,
-			currentTime
-		} = this.props;
-
-		let timelineOptions = options;
-
-		if (animate) {
-			// If animate option is set, we should animate the timeline to any new
-			// start/end values instead of jumping straight to them
-			timelineOptions = _omit(options, 'start', 'end');
-
-			this.timeline.setWindow(options.start, options.end, {
-				animation: animate
-			} as TimelineAnimationOptions);
-		}
-
-		this.timeline.setOptions(timelineOptions);
-
-		if (initialGroups?.length > 0) {
-			this.groups.add(initialGroups);
-		}
-
-		if (initialItems?.length > 0) {
-			this.items.add(initialItems);
-		}
-
-		this.updateSelection(selection, selectionOptions);
-
-		if (currentTime) {
-			this.timeline.setCurrentTime(currentTime);
-		}
-
-		this.updateCustomTimes([], customTimes);
-	}
-
-	render() {
+	override render() {
 		return <div ref={this.#ref} />;
 	}
 }
